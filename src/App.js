@@ -22,7 +22,7 @@ function App() {
           email: user.email,
           displayName: user.displayName || user.email,
           uid: user.uid,
-          isAdmin: user.email === 'jombenitez96@gmail.com'
+          isAdmin: user.email === 'jom@gmail.com'
         };
         setUser(userData);
         setIsLoggedIn(true);
@@ -100,9 +100,9 @@ function App() {
         <>
           <div className="app-header">
             <div className="header-content">
-              <div className="header-left">
-                <h1 className="instagram-text">Instagram</h1>
-              </div>
+                          <div className="header-left">
+              <h1 className="birthday-text">🎉 Happy Birthday 🎉</h1>
+            </div>
               <div className="header-right">
                 <span className="welcome-text">Welcome, {user?.displayName || user?.email || 'User'}!</span>
                 {/* Only show Admin Panel button for admin users */}

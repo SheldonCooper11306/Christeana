@@ -20,15 +20,17 @@
   margin-bottom: 10px;
 }
 
-.instagram-logo {
+.birthday-logo {
   margin: 22px auto 12px;
   text-align: center;
 }
 
-.logo-image {
-  height: 51px;
-  width: auto;
-  filter: invert(1);
+.birthday-title {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .login-form {
@@ -96,6 +98,44 @@
   cursor: not-allowed;
 }
 
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.login-button,
+.create-account-button {
+  flex: 1;
+  min-height: 44px;
+}
+
+.create-account-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 5px 9px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-account-button:hover:not(:disabled) {
+  background: #218838;
+}
+
+.create-account-button:active:not(:disabled) {
+  background: #1e7e34;
+  transform: scale(0.98);
+}
+
+.create-account-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
 .error-message {
   color: #ed4956;
   background: transparent;
@@ -131,49 +171,7 @@
   text-transform: uppercase;
 }
 
-.google-login {
-  margin: 8px 0;
-}
 
-.google-button {
-  background: #ffffff;
-  border: 1px solid #dadce0;
-  color: #3c4043;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  min-height: 44px;
-  font-family: 'Roboto', sans-serif;
-}
-
-.google-button:hover {
-  background: #f8f9fa;
-  border-color: #dadce0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-}
-
-.google-button:active {
-  background: #f1f3f4;
-  transform: scale(0.98);
-}
-
-.google-button:disabled {
-  background: #f1f3f4;
-  color: #9aa0a6;
-  cursor: not-allowed;
-}
-
-.google-icon {
-  flex-shrink: 0;
-}
 
 
 
@@ -202,10 +200,7 @@
     font-size: 13px;
   }
   
-  .google-button {
-    min-height: 42px;
-    font-size: 13px;
-  }
+
   
 
 }
@@ -237,10 +232,7 @@
   
 
   
-  .google-button {
-    min-height: 40px;
-    font-size: 12px;
-  }
+
   
   .divider span {
     font-size: 12px;
@@ -271,10 +263,7 @@
     font-size: 11px;
   }
   
-  .google-button {
-    min-height: 38px;
-    font-size: 11px;
-  }
+
   
   .divider span {
     font-size: 11px;
@@ -293,14 +282,5 @@
     transform: scale(0.98);
   }
   
-  .google-button:hover {
-    background: #ffffff;
-    border-color: #dadce0;
-    box-shadow: none;
-  }
-  
-  .google-button:active {
-    background: #f1f3f4;
-    transform: scale(0.98);
-  }
+
 }
