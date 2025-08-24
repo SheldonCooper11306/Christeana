@@ -20,15 +20,18 @@
   margin-bottom: 10px;
 }
 
-.instagram-logo {
+.birthday-logo {
   margin: 22px auto 12px;
   text-align: center;
 }
 
-.logo-image {
-  height: 51px;
-  width: auto;
-  filter: invert(1);
+.birthday-title {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  font-family: 'Instagram Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .login-form {
@@ -154,8 +157,8 @@
     max-width: 320px;
   }
   
-  .logo-image {
-    height: 45px;
+  .birthday-title {
+    font-size: 24px;
   }
   
   .form-input {
@@ -180,8 +183,8 @@
     border-radius: 0;
   }
   
-  .logo-image {
-    height: 40px;
+  .birthday-title {
+    font-size: 20px;
   }
   
   .form-input {
@@ -213,8 +216,8 @@
     padding: 14px 20px;
   }
   
-  .logo-image {
-    height: 35px;
+  .birthday-title {
+    font-size: 18px;
   }
   
   .form-input {

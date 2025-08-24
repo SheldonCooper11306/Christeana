@@ -48,12 +48,8 @@ const Login = ({ onLogin }) => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <div className="instagram-logo">
-          <img 
-            src="https://www.instagram.com/static/images/web/logged_out_wordmark.png/7a252de00b20.png" 
-            alt="Instagram" 
-            className="logo-image"
-          />
+        <div className="birthday-logo">
+          <h1 className="birthday-title">🎉 Happy Birthday 🎉</h1>
         </div>
 
         <form onSubmit={handleEmailLogin} className="login-form">
