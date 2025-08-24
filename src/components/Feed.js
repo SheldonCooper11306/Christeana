@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Post from './Post';
+import { database } from '../firebase/config';
+import { ref, onValue, set, push, child } from 'firebase/database';
 import './Feed.css';
 
 const Feed = ({ currentUser }) => {
@@ -48,11 +50,33 @@ const Feed = ({ currentUser }) => {
       }
     ];
 
-    setPosts(specificPosts);
-    setLoading(false);
+    // Initialize posts in database if they don't exist
+    const postsRef = ref(database, 'posts');
+    onValue(postsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) {
+        // Initialize posts in database
+        set(postsRef, specificPosts);
+        setPosts(specificPosts);
+      } else {
+        // Use existing data from database
+        setPosts(Object.values(data));
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      // Cleanup listener
+      const postsRef = ref(database, 'posts');
+      onValue(postsRef, () => {});
+    };
   }, []);
 
   const handleLike = (postId) => {
+    const postRef = ref(database, `posts/${postId - 1}/likes`);
+    set(postRef, posts.find(p => p.id === postId).likes + 1);
+    
+    // Also update local state
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post.id === postId
@@ -63,6 +87,14 @@ const Feed = ({ currentUser }) => {
   };
 
   const handleComment = (postId, comment) => {
+    const commentsRef = ref(database, `posts/${postId - 1}/comments`);
+    const newCommentRef = push(commentsRef);
+    set(newCommentRef, {
+      ...comment,
+      timestamp: Date.now()
+    });
+    
+    // Also update local state
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post.id === postId
