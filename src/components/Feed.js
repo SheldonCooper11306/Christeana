@@ -44,7 +44,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
         musicTrack: 'We Could Happen',
         musicArtist: 'AJ Rafael',
         musicUrl: '/Aj Rafael - We Could Happen (Lyrics).mp3'
-
+      }
     ];
 
     // Set posts immediately
