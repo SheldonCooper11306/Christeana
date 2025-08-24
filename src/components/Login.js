@@ -12,39 +12,35 @@ const Login = ({ onLogin }) => {
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please enter both email and password');
+      setError('Please enter both username and password');
       return;
     }
 
     setIsLoading(true);
     setError('');
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
+    // Check if it's one of the predefined accounts
+    const validAccounts = {
+      'jom': 'jom123',
+      'eana': 'eana123',
+      'xandy': 'xandy123',
+      'guest': 'guest123'
+    };
+
+    if (validAccounts[email] && validAccounts[email] === password) {
       const userData = {
-        email: user.email,
-        displayName: user.displayName || user.email,
-        uid: user.uid,
+        email: email,
+        displayName: email,
+        uid: `user_${email}`,
         isAdmin: email === 'jom'
       };
       
       onLogin(userData);
-    } catch (error) {
-      console.error('Login error:', error);
-      if (error.code === 'auth/user-not-found') {
-        setError('User not found. Please check your email or create an account.');
-      } else if (error.code === 'auth/wrong-password') {
-        setError('Incorrect password. Please try again.');
-      } else if (error.code === 'auth/invalid-email') {
-        setError('Invalid email address.');
-      } else {
-        setError('Login failed. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError('Invalid username or password. Please try again.');
     }
+
+    setIsLoading(false);
   };
 
 
@@ -61,16 +57,16 @@ const Login = ({ onLogin }) => {
         </div>
 
         <form onSubmit={handleEmailLogin} className="login-form">
-          <div className="form-group">
-            <input
-              type="email"
-              className="form-input"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
+                  <div className="form-group">
+          <input
+            type="text"
+            className="form-input"
+            placeholder="Username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+          />
+        </div>
           <div className="form-group">
             <input
               type="password"

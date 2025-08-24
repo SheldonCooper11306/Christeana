@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from './firebase/config';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Login from './components/Login';
 import Feed from './components/Feed';
 import AdminPanel from './components/AdminPanel';
@@ -16,41 +14,20 @@ function App() {
   const isAdmin = user && user.isAdmin;
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const userData = {
-          email: user.email,
-          displayName: user.displayName || user.email,
-          uid: user.uid,
-          isAdmin: user.email === 'jom'
-        };
-        setUser(userData);
-        setIsLoggedIn(true);
-      } else {
-        setUser(null);
-        setIsLoggedIn(false);
-        setShowAdmin(false);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    // Since we're not using Firebase Auth anymore, we'll handle login state differently
+    setLoading(false);
   }, []);
 
   const handleLogin = (userData) => {
-    // This will be handled by the auth state listener
+    setUser(userData);
+    setIsLoggedIn(true);
     console.log('User logged in:', userData);
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      setIsLoggedIn(false);
-      setShowAdmin(false);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const handleLogout = () => {
+    setUser(null);
+    setIsLoggedIn(false);
+    setShowAdmin(false);
   };
 
   const toggleAdmin = () => {
