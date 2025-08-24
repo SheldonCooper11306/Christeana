@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { auth } from './firebase/config';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Login from './components/Login';
 import Feed from './components/Feed';
 import AdminPanel from './components/AdminPanel';
@@ -10,46 +12,42 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // List of admin users who can access the Admin Panel
-  const ADMIN_USERS = [
-    'jombenitez96@gmail.com',  // Your admin email
-    'jombenitez96 (Google)'    // Google login user
-  ];
-
   // Check if current user is an admin
-  const isAdmin = user && (ADMIN_USERS.includes(user.email) || ADMIN_USERS.includes(user.displayName));
+  const isAdmin = user && user.isAdmin;
 
   useEffect(() => {
-    // Check if user is already logged in (from localStorage)
-    const savedUser = localStorage.getItem('birthday-user');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userData = {
+          email: user.email,
+          displayName: user.displayName || user.email,
+          uid: user.uid,
+          isAdmin: user.email === 'jombenitez96@gmail.com'
+        };
         setUser(userData);
         setIsLoggedIn(true);
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('birthday-user');
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+        setShowAdmin(false);
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const handleLogin = (userData) => {
-    setUser(userData);
-    setIsLoggedIn(true);
-    setShowAdmin(false);
-    // Save user to localStorage
-    localStorage.setItem('birthday-user', JSON.stringify(userData));
+    // This will be handled by the auth state listener
+    console.log('User logged in:', userData);
   };
 
   const handleLogout = async () => {
     try {
+      await signOut(auth);
       setUser(null);
       setIsLoggedIn(false);
       setShowAdmin(false);
-      // Remove user from localStorage
-      localStorage.removeItem('birthday-user');
     } catch (error) {
       console.error('Logout error:', error);
     }
