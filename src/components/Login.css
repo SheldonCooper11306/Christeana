@@ -175,6 +175,45 @@
   flex-shrink: 0;
 }
 
+.anonymous-login {
+  margin: 8px 0;
+}
+
+.anonymous-button {
+  background: #262626;
+  border: 1px solid #404040;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.anonymous-button:hover {
+  background: #404040;
+  border-color: #525252;
+}
+
+.anonymous-button:active {
+  background: #1a1a1a;
+  transform: scale(0.98);
+}
+
+.anonymous-button:disabled {
+  background: #1a1a1a;
+  color: #8e8e8e;
+  cursor: not-allowed;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .login-container {
@@ -204,6 +243,11 @@
     min-height: 42px;
     font-size: 13px;
   }
+  
+  .anonymous-button {
+    min-height: 42px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -227,6 +271,11 @@
   }
   
   .login-button {
+    min-height: 40px;
+    font-size: 12px;
+  }
+  
+  .anonymous-button {
     min-height: 40px;
     font-size: 12px;
   }
