@@ -35,6 +35,7 @@
 }
 
 .export-button,
+.test-email-button,
 .refresh-button {
   background: #0095f6;
   color: white;
@@ -46,6 +47,20 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 36px;
+}
+
+.test-email-button {
+  background: #28a745;
+}
+
+.test-email-button:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.test-email-button:active {
+  background: #1e7e34;
+  transform: translateY(0);
 }
 
 .export-button:hover,

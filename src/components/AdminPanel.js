@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import databaseService from '../services/databaseService';
+import emailService from '../services/emailService';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
@@ -108,6 +109,22 @@ const AdminPanel = () => {
     URL.revokeObjectURL(url);
   };
 
+  const testEmailSystem = async () => {
+    try {
+      console.log('Testing email system...');
+      const result = await emailService.sendTestEmail();
+      
+      if (result.success) {
+        alert('✅ Test email sent successfully! Check your email inbox.');
+      } else {
+        alert(`❌ Test email failed: ${result.error}\n\nPlease check your EmailJS configuration in src/config/emailConfig.js`);
+      }
+    } catch (error) {
+      console.error('Email test error:', error);
+      alert(`❌ Email test error: ${error.message}`);
+    }
+  };
+
   const getDeviceInfo = (userAgent) => {
     if (!userAgent) return 'Unknown';
     
@@ -149,7 +166,10 @@ const AdminPanel = () => {
         <div className="admin-stats">
           <span>Total Messages: {messages.length}</span>
           <button onClick={exportMessages} className="export-button">Export Messages</button>
-          <button onClick={loadMessages} className="refresh-button">Refresh</button>
+          <button onClick={testEmailSystem} className="test-email-button" title="Test email notification system">
+            📧 Test Email
+          </button>
+          <button onClick={() => window.location.reload()} className="refresh-button">Refresh</button>
         </div>
       </div>
 

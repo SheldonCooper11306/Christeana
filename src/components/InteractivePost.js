@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import databaseService from '../services/databaseService';
+import emailService from '../services/emailService';
 import './InteractivePost.css';
 
 const InteractivePost = ({ postId, onMessageSubmitted }) => {
@@ -56,6 +57,23 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
       if (result.success) {
         setMessage('');
         setSubmitted(true);
+        
+        // Send email notification in background
+        try {
+          console.log('Sending email notification...');
+          const emailResult = await emailService.sendBirthdayMessageNotification(messageData);
+          
+          if (emailResult.success) {
+            console.log('✅ Email notification sent successfully!');
+          } else {
+            console.log('⚠️ Email notification failed, trying fallback...');
+            const fallbackResult = await emailService.sendEmailFallback(messageData);
+            console.log('Fallback email result:', fallbackResult);
+          }
+        } catch (emailError) {
+          console.error('Email notification error:', emailError);
+          // Don't let email errors affect the user experience
+        }
         
         if (onMessageSubmitted) {
           onMessageSubmitted({
