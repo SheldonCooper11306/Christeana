@@ -144,8 +144,7 @@ function App() {
               </div>
             </div>
           </div>
-          <TestFeed currentUser={user} />
-          <DebugInfo posts={posts} currentUser={user} isLoggedIn={isLoggedIn} />
+          <Feed currentUser={user} onPostsLoaded={setPosts} />
         </>
       )}
     </div>

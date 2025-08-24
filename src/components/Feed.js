@@ -56,8 +56,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
       }
     ];
 
-    // Set posts immediately with debug logging
-    console.log('Setting default posts:', defaultPosts);
+    // Set posts immediately
     setPosts(defaultPosts);
     setLoading(false);
     
@@ -197,8 +196,6 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
     );
   }
 
-  console.log('Rendering posts:', posts);
-
   return (
     <div className="feed-container">
       <div className="feed-posts">
@@ -207,18 +204,15 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
             <p>No posts available</p>
           </div>
         ) : (
-          posts.map(post => {
-            console.log('Rendering post:', post.id, post);
-            return (
-              <Post
-                key={post.id}
-                {...post}
-                currentUser={currentUser}
-                onLike={() => handleLike(post.id)}
-                onComment={handleComment}
-              />
-            );
-          })
+          posts.map(post => (
+            <Post
+              key={post.id}
+              {...post}
+              currentUser={currentUser}
+              onLike={() => handleLike(post.id)}
+              onComment={handleComment}
+            />
+          ))
         )}
       </div>
     </div>
