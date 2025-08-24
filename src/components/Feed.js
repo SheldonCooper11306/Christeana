@@ -50,42 +50,74 @@ const Feed = ({ currentUser }) => {
       }
     ];
 
-    // Show posts immediately for better UX
+    // Show posts immediately - no database loading needed
     setPosts(specificPosts);
     setLoading(false);
 
-    // Set a safety timeout to ensure loading doesn't get stuck
-    const timeoutId = setTimeout(() => {
-      setLoading(false);
-    }, 3000); // 3 seconds timeout
+    // Load user interactions (likes, comments) from database
+    const loadUserInteractions = async () => {
+      try {
+        // Load likes for each post
+        for (let i = 0; i < specificPosts.length; i++) {
+          const postId = i + 1;
+          
+          // Load likes count
+          const likesRef = ref(database, `posts/${postId}/likes`);
+          onValue(likesRef, (snapshot) => {
+            const likesCount = snapshot.val() || 0;
+            if (likesCount > 0) {
+              setPosts(prevPosts => 
+                prevPosts.map(post => 
+                  post.id === postId ? { ...post, likes: likesCount } : post
+                )
+              );
+            }
+          });
 
-    // Initialize posts in database in the background
-    const postsRef = ref(database, 'posts');
-    onValue(postsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (!data) {
-        // Initialize posts in database
-        set(postsRef, specificPosts);
-      } else {
-        // Update posts with database data if different
-        const dbPosts = Object.values(data);
-        if (JSON.stringify(dbPosts) !== JSON.stringify(specificPosts)) {
-          setPosts(dbPosts);
+          // Load comments
+          const commentsRef = ref(database, `posts/${postId}/comments`);
+          onValue(commentsRef, (snapshot) => {
+            const comments = snapshot.val() || [];
+            if (comments.length > 0) {
+              setPosts(prevPosts => 
+                prevPosts.map(post => 
+                  post.id === postId ? { ...post, comments: comments } : post
+                )
+              );
+            }
+          });
         }
+      } catch (error) {
+        console.log('Loading user interactions:', error);
       }
-    });
+    };
+
+    // Load interactions in background
+    loadUserInteractions();
 
     return () => {
-      // Cleanup listener and timeout
-      clearTimeout(timeoutId);
+      // Cleanup listeners
       const postsRef = ref(database, 'posts');
       onValue(postsRef, () => {});
     };
   }, []);
 
   const handleLike = (postId) => {
-    const postRef = ref(database, `posts/${postId - 1}/likes`);
-    set(postRef, posts.find(p => p.id === postId).likes + 1);
+    const currentPost = posts.find(p => p.id === postId);
+    const newLikesCount = currentPost.likes + 1;
+    
+    // Update local state immediately for better UX
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.id === postId
+          ? { ...post, likes: newLikesCount }
+          : post
+      )
+    );
+    
+    // Save to database in background
+    const postRef = ref(database, `posts/${postId}/likes`);
+    set(postRef, newLikesCount);
     
     // Track user interaction in database
     if (currentUser) {
@@ -96,33 +128,27 @@ const Feed = ({ currentUser }) => {
         action: 'like'
       });
     }
-    
-    // Also update local state
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.id === postId
-          ? { ...post, likes: post.likes + 1 }
-          : post
-      )
-    );
   };
 
   const handleComment = (postId, comment) => {
-    const commentsRef = ref(database, `posts/${postId - 1}/comments`);
-    const newCommentRef = push(commentsRef);
-    set(newCommentRef, {
+    const newComment = {
       ...comment,
       timestamp: Date.now()
-    });
+    };
     
-    // Also update local state
+    // Update local state immediately for better UX
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post.id === postId
-          ? { ...post, comments: [...post.comments, comment] }
+          ? { ...post, comments: [...post.comments, newComment] }
           : post
       )
     );
+    
+    // Save to database in background
+    const commentsRef = ref(database, `posts/${postId}/comments`);
+    const newCommentRef = push(commentsRef);
+    set(newCommentRef, newComment);
   };
 
   if (loading) {
