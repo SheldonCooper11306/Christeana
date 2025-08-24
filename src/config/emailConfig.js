@@ -3,13 +3,13 @@
 
 export const emailConfig = {
   // EmailJS Service ID (from your EmailJS dashboard)
-  serviceId: 'service_birthday_app', // Replace with your actual service ID
+  serviceId: 'service_6q393hg', // Your actual service ID
   
   // EmailJS Template ID (from your EmailJS dashboard)  
-  templateId: 'template_birthday_message', // Replace with your actual template ID
+  templateId: 'template_9tikwwc', // Your actual template ID
   
   // EmailJS Public Key (from your EmailJS dashboard)
-  publicKey: 'YOUR_EMAILJS_PUBLIC_KEY', // Replace with your actual public key
+  publicKey: 'RN8GBBzAeXuTZI_yw', // Your actual public key
   
   // Your email address where notifications will be sent
   toEmail: 'jombenitez96@gmail.com',
