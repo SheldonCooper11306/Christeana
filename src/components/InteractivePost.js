@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase/config';
-import { collection, addDoc, getDocs, orderBy, query, serverTimestamp } from 'firebase/firestore';
 import './InteractivePost.css';
 
 const InteractivePost = ({ postId, onMessageSubmitted }) => {
@@ -17,19 +15,7 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
   const loadMessages = async () => {
     try {
       setLoading(true);
-      const messagesRef = collection(db, 'birthday-messages');
-      const q = query(messagesRef, orderBy('timestamp', 'desc'));
-      const querySnapshot = await getDocs(q);
-      
-      const messagesData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
-      setMessages(messagesData);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      // Fallback to localStorage if Firebase fails
+      // Load messages from localStorage
       try {
         const savedMessages = localStorage.getItem('birthday-messages');
         if (savedMessages) {
@@ -38,6 +24,9 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
       } catch (localError) {
         console.error('Error loading from localStorage:', localError);
       }
+      
+    } catch (error) {
+      console.error('Error loading messages:', error);
     } finally {
       setLoading(false);
     }
@@ -48,66 +37,36 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
     if (!message.trim()) return;
 
     setIsSubmitting(true);
+
     try {
       const newMessage = {
+        id: Date.now(),
         text: message,
         username: 'eana',
-        timestamp: serverTimestamp(),
-        createdAt: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        pageUrl: window.location.href,
+        referrer: document.referrer,
+        screenResolution: `${screen.width}x${screen.height}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       };
 
-      // Save to Firebase
-      const messagesRef = collection(db, 'birthday-messages');
-      const docRef = await addDoc(messagesRef, newMessage);
-      
-      // Add the new message to local state
-      const messageWithId = {
-        id: docRef.id,
-        ...newMessage,
-        timestamp: new Date() // Use local timestamp for immediate display
-      };
-      
-      const updatedMessages = [messageWithId, ...messages];
+      const updatedMessages = [newMessage, ...messages];
       setMessages(updatedMessages);
-      
-      // Also save to localStorage as backup
       localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
       
       setMessage('');
       setSubmitted(true);
       if (onMessageSubmitted) {
-        onMessageSubmitted(messageWithId);
+        onMessageSubmitted(newMessage);
       }
       
       // Reset submitted state after 3 seconds
       setTimeout(() => setSubmitted(false), 3000);
+      
     } catch (error) {
       console.error('Error submitting message:', error);
-      
-      // Fallback to localStorage if Firebase fails
-      try {
-        const newMessage = {
-          id: Date.now(),
-          text: message,
-          username: 'eana',
-          timestamp: new Date().toISOString()
-        };
-
-        const updatedMessages = [newMessage, ...messages];
-        setMessages(updatedMessages);
-        localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
-        
-        setMessage('');
-        setSubmitted(true);
-        if (onMessageSubmitted) {
-          onMessageSubmitted(newMessage);
-        }
-        
-        setTimeout(() => setSubmitted(false), 3000);
-      } catch (localError) {
-        console.error('Error saving to localStorage:', localError);
-        alert('Failed to save message. Please try again.');
-      }
+      alert('Failed to save message. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

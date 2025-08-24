@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase/config';
-import { collection, getDocs, orderBy, query, deleteDoc, doc } from 'firebase/firestore';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
@@ -17,19 +15,20 @@ const AdminPanel = () => {
       setLoading(true);
       setError(null);
       
-      const messagesRef = collection(db, 'birthday-messages');
-      const q = query(messagesRef, orderBy('timestamp', 'desc'));
-      const querySnapshot = await getDocs(q);
+      // Load messages from localStorage
+      try {
+        const savedMessages = localStorage.getItem('birthday-messages');
+        if (savedMessages) {
+          setMessages(JSON.parse(savedMessages));
+        }
+      } catch (localError) {
+        console.error('Error loading from localStorage:', localError);
+        setError('Failed to load messages from local storage.');
+      }
       
-      const messagesData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
-      setMessages(messagesData);
     } catch (error) {
       console.error('Error loading messages:', error);
-      setError('Failed to load messages. Please check your Firebase configuration.');
+      setError('Failed to load messages. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -38,8 +37,9 @@ const AdminPanel = () => {
   const deleteMessage = async (messageId) => {
     if (window.confirm('Are you sure you want to delete this message?')) {
       try {
-        await deleteDoc(doc(db, 'birthday-messages', messageId));
-        setMessages(prev => prev.filter(msg => msg.id !== messageId));
+        const updatedMessages = messages.filter(msg => msg.id !== messageId);
+        setMessages(updatedMessages);
+        localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
       } catch (error) {
         console.error('Error deleting message:', error);
         alert('Failed to delete message.');
@@ -67,8 +67,14 @@ const AdminPanel = () => {
 
   const exportMessages = () => {
     const messagesText = messages.map(msg => 
-      `[${formatTime(msg.timestamp)}] ${msg.username}: ${msg.text}`
-    ).join('\n');
+      `[${formatTime(msg.timestamp)}] ${msg.username}: ${msg.text}\n` +
+      `Device: ${msg.userAgent || 'Unknown'}\n` +
+      `Screen: ${msg.screenResolution || 'Unknown'}\n` +
+      `Timezone: ${msg.timezone || 'Unknown'}\n` +
+      `URL: ${msg.pageUrl || 'Unknown'}\n` +
+      `Referrer: ${msg.referrer || 'Direct'}\n` +
+      `---`
+    ).join('\n\n');
     
     const blob = new Blob([messagesText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -79,6 +85,17 @@ const AdminPanel = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const getDeviceInfo = (userAgent) => {
+    if (!userAgent) return 'Unknown';
+    
+    if (userAgent.includes('Mobile')) return '📱 Mobile';
+    if (userAgent.includes('Tablet')) return '📱 Tablet';
+    if (userAgent.includes('Windows')) return '💻 Windows';
+    if (userAgent.includes('Mac')) return '🍎 Mac';
+    if (userAgent.includes('Linux')) return '🐧 Linux';
+    return '💻 Desktop';
   };
 
   if (loading) {
@@ -138,6 +155,33 @@ const AdminPanel = () => {
                 </button>
               </div>
               <div className="message-content">{message.text}</div>
+              
+              {/* Device and interaction details */}
+              <div className="message-details">
+                <div className="detail-item">
+                  <strong>Device:</strong> {getDeviceInfo(message.userAgent)}
+                </div>
+                {message.screenResolution && (
+                  <div className="detail-item">
+                    <strong>Screen:</strong> {message.screenResolution}
+                  </div>
+                )}
+                {message.timezone && (
+                  <div className="detail-item">
+                    <strong>Timezone:</strong> {message.timezone}
+                  </div>
+                )}
+                {message.pageUrl && (
+                  <div className="detail-item">
+                    <strong>Page:</strong> {message.pageUrl}
+                  </div>
+                )}
+                {message.referrer && (
+                  <div className="detail-item">
+                    <strong>Referrer:</strong> {message.referrer}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

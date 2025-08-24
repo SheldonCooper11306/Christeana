@@ -116,19 +116,19 @@ const Post = ({
           </div>
         );
       
-             case 'group-photos':
-         return (
-           <div className="group-photos">
-             {images.map((image, index) => (
-               <img 
-                 key={index} 
-                 src={image} 
-                 alt={`Photo ${index + 1}`} 
-                 className="group-photo"
-               />
-             ))}
-           </div>
-         );
+      case 'group-photos':
+        return (
+          <div className="group-photos">
+            {images.map((image, index) => (
+              <img 
+                key={index} 
+                src={image} 
+                alt={`Photo ${index + 1}`} 
+                className="group-photo"
+              />
+            ))}
+          </div>
+        );
       
       case 'interactive':
         return <InteractivePost postId={id} onMessageSubmitted={onComment} />;
@@ -234,30 +234,30 @@ const Post = ({
               )}
             </div>
           )}
-
-          {showComments && (
-            <div className="comments-expanded">
-              {comments.map((comment, index) => (
-                <div key={index} className="comment">
-                  <span className="username">{comment.username}</span> {comment.text}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <form onSubmit={handleComment} className="comment-form">
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="comment-input"
-            />
-            <button type="submit" className="comment-submit" disabled={!commentText.trim()}>
-              Post
-            </button>
-          </form>
         </div>
+
+        {showComments && (
+          <div className="comments-expanded">
+            {comments.map((comment, index) => (
+              <div key={index} className="comment">
+                <span className="username">{comment.username}</span> {comment.text}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleComment} className="comment-form">
+          <input
+            type="text"
+            placeholder="Add a comment..."
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            className="comment-input"
+          />
+          <button type="submit" className="comment-submit" disabled={!commentText.trim()}>
+            Post
+          </button>
+        </form>
       </div>
     </div>
   );

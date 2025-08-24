@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Post from './Post';
+import InteractivePost from './InteractivePost';
 import './Feed.css';
 
 const Feed = ({ currentUser }) => {
@@ -7,7 +8,7 @@ const Feed = ({ currentUser }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set the 3 specific posts
+    // Set the 3 specific posts exactly as they were
     const specificPosts = [
       {
         id: 1,
