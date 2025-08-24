@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import databaseService from '../services/databaseService';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
@@ -7,42 +8,66 @@ const AdminPanel = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadMessages();
-  }, []);
-
-  const loadMessages = async () => {
-    try {
-      setLoading(true);
+    // Set up real-time listener for birthday messages
+    const unsubscribe = databaseService.listenToBirthdayMessages((messagesData) => {
+      setMessages(messagesData);
+      setLoading(false);
       setError(null);
-      
-      // Load messages from localStorage
+    });
+
+    // Also try to load from localStorage as fallback
+    const loadFallbackMessages = () => {
       try {
         const savedMessages = localStorage.getItem('birthday-messages');
         if (savedMessages) {
-          setMessages(JSON.parse(savedMessages));
+          const localMessages = JSON.parse(savedMessages);
+          // Only use local messages if we don't have any from Firebase
+          if (messages.length === 0) {
+            setMessages(localMessages);
+          }
         }
       } catch (localError) {
         console.error('Error loading from localStorage:', localError);
-        setError('Failed to load messages from local storage.');
       }
-      
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      setError('Failed to load messages. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    // Load fallback messages after a delay to give Firebase time
+    setTimeout(loadFallbackMessages, 2000);
+
+    // Cleanup function
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [messages.length]);
 
   const deleteMessage = async (messageId) => {
     if (window.confirm('Are you sure you want to delete this message?')) {
       try {
-        const updatedMessages = messages.filter(msg => msg.id !== messageId);
-        setMessages(updatedMessages);
-        localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
+        // Try to delete from Firebase first
+        const result = await databaseService.deleteBirthdayMessage(messageId);
+        
+        if (result.success) {
+          // Firebase deletion successful, message will be removed via real-time listener
+          console.log('Message deleted successfully');
+        } else {
+          throw new Error(result.error || 'Failed to delete from Firebase');
+        }
+        
       } catch (error) {
-        console.error('Error deleting message:', error);
-        alert('Failed to delete message.');
+        console.error('Error deleting message from Firebase:', error);
+        
+        // Fallback: delete from localStorage
+        try {
+          const updatedMessages = messages.filter(msg => msg.id !== messageId);
+          setMessages(updatedMessages);
+          localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
+          console.log('Message deleted from localStorage as fallback');
+        } catch (fallbackError) {
+          console.error('Error deleting from localStorage:', fallbackError);
+          alert('Failed to delete message.');
+        }
       }
     }
   };

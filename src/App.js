@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Feed from './components/Feed';
 import AdminPanel from './components/AdminPanel';
+import authService from './services/authService';
+import databaseService from './services/databaseService';
 import './App.css';
 
 function App() {
@@ -14,8 +16,47 @@ function App() {
   const isAdmin = user && user.isAdmin;
 
   useEffect(() => {
-    // Since we're not using Firebase Auth anymore, we'll handle login state differently
-    setLoading(false);
+    // Initialize services and auth state
+    const initializeApp = async () => {
+      try {
+        // Initialize predefined accounts in Firebase
+        await authService.initializePredefinedAccounts();
+        
+        // Set up auth state listener
+        const unsubscribe = authService.onAuthStateChange((userData) => {
+          if (userData) {
+            setUser(userData);
+            setIsLoggedIn(true);
+            
+            // Track page view
+            databaseService.trackPageView(userData.uid, window.location.href);
+          } else {
+            setUser(null);
+            setIsLoggedIn(false);
+            setShowAdmin(false);
+          }
+          setLoading(false);
+        });
+
+        // If no user after 2 seconds, stop loading
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
+
+        return unsubscribe;
+      } catch (error) {
+        console.error('Error initializing app:', error);
+        setLoading(false);
+      }
+    };
+
+    const unsubscribe = initializeApp();
+    
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const handleLogin = (userData) => {
@@ -24,10 +65,27 @@ function App() {
     console.log('User logged in:', userData);
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setIsLoggedIn(false);
-    setShowAdmin(false);
+  const handleLogout = async () => {
+    try {
+      const result = await authService.logout();
+      if (result.success) {
+        setUser(null);
+        setIsLoggedIn(false);
+        setShowAdmin(false);
+      } else {
+        console.error('Logout failed:', result.error);
+        // Still clear state even if Firebase logout fails
+        setUser(null);
+        setIsLoggedIn(false);
+        setShowAdmin(false);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Clear state anyway
+      setUser(null);
+      setIsLoggedIn(false);
+      setShowAdmin(false);
+    }
   };
 
   const toggleAdmin = () => {

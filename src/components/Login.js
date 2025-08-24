@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { auth } from '../firebase/config';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import authService from '../services/authService';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!username || !password) {
       setError('Please enter both username and password');
       return;
     }
@@ -19,25 +18,23 @@ const Login = ({ onLogin }) => {
     setIsLoading(true);
     setError('');
 
-    // Check if it's one of the predefined accounts
-    const validAccounts = {
-      'jom': 'jom123',
-      'eana': 'eana123',
-      'xandy': 'xandy123',
-      'guest': 'guest123'
-    };
-
-    if (validAccounts[email] && validAccounts[email] === password) {
-      const userData = {
-        email: email,
-        displayName: email,
-        uid: `user_${email}`,
-        isAdmin: email === 'jom'
-      };
+    try {
+      // Try Firebase Auth first
+      let result = await authService.loginWithCredentials(username, password);
       
-      onLogin(userData);
-    } else {
-      setError('Invalid username or password. Please try again.');
+      // If Firebase Auth fails, try fallback login
+      if (!result.success) {
+        result = authService.loginFallback(username, password);
+      }
+
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.error || 'Invalid username or password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Login failed. Please try again.');
     }
 
     setIsLoading(false);
@@ -62,8 +59,8 @@ const Login = ({ onLogin }) => {
             type="text"
             className="form-input"
             placeholder="Username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             disabled={isLoading}
           />
         </div>

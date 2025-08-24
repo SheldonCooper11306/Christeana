@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import databaseService from '../services/databaseService';
 import './InteractivePost.css';
 
 const InteractivePost = ({ postId, onMessageSubmitted }) => {
@@ -9,28 +10,19 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadMessages();
-  }, []);
-
-  const loadMessages = async () => {
-    try {
-      setLoading(true);
-      // Load messages from localStorage
-      try {
-        const savedMessages = localStorage.getItem('birthday-messages');
-        if (savedMessages) {
-          setMessages(JSON.parse(savedMessages));
-        }
-      } catch (localError) {
-        console.error('Error loading from localStorage:', localError);
-      }
-      
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    } finally {
+    // Set up real-time listener for birthday messages
+    const unsubscribe = databaseService.listenToBirthdayMessages((messagesData) => {
+      setMessages(messagesData);
       setLoading(false);
-    }
-  };
+    });
+
+    // Cleanup function
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,34 +31,60 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
     setIsSubmitting(true);
 
     try {
-      const newMessage = {
-        id: Date.now(),
+      const messageData = {
         text: message,
-        username: 'eana',
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        pageUrl: window.location.href,
-        referrer: document.referrer,
-        screenResolution: `${screen.width}x${screen.height}`,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        username: 'eana' // Default username, could be dynamic based on current user
       };
 
-      const updatedMessages = [newMessage, ...messages];
-      setMessages(updatedMessages);
-      localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
+      const result = await databaseService.saveBirthdayMessage(messageData);
       
-      setMessage('');
-      setSubmitted(true);
-      if (onMessageSubmitted) {
-        onMessageSubmitted(newMessage);
+      if (result.success) {
+        setMessage('');
+        setSubmitted(true);
+        
+        if (onMessageSubmitted) {
+          onMessageSubmitted({
+            id: result.messageId,
+            ...messageData,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        // Reset submitted state after 3 seconds
+        setTimeout(() => setSubmitted(false), 3000);
+      } else {
+        throw new Error(result.error || 'Failed to save message');
       }
-      
-      // Reset submitted state after 3 seconds
-      setTimeout(() => setSubmitted(false), 3000);
       
     } catch (error) {
       console.error('Error submitting message:', error);
       alert('Failed to save message. Please try again.');
+      
+      // Fallback to localStorage if Firebase fails
+      try {
+        const fallbackMessage = {
+          id: Date.now(),
+          text: message,
+          username: 'eana',
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          pageUrl: window.location.href,
+          referrer: document.referrer,
+          screenResolution: `${screen.width}x${screen.height}`,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        };
+
+        const savedMessages = localStorage.getItem('birthday-messages');
+        const existingMessages = savedMessages ? JSON.parse(savedMessages) : [];
+        const updatedMessages = [fallbackMessage, ...existingMessages];
+        localStorage.setItem('birthday-messages', JSON.stringify(updatedMessages));
+        
+        setMessage('');
+        setSubmitted(true);
+        setTimeout(() => setSubmitted(false), 3000);
+      } catch (fallbackError) {
+        console.error('Fallback save also failed:', fallbackError);
+      }
     } finally {
       setIsSubmitting(false);
     }

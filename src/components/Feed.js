@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Post from './Post';
-import { database } from '../firebase/config';
-import { ref, onValue, set, push, child } from 'firebase/database';
+import databaseService from '../services/databaseService';
 import './Feed.css';
 
 const Feed = ({ currentUser }) => {
@@ -9,100 +8,117 @@ const Feed = ({ currentUser }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set the 3 specific posts exactly as they were
-    const specificPosts = [
-      {
-        id: 1,
-        type: 'photo',
-        imageUrl: '/BirthdayGirl.jpg',
-        caption: 'Happy Birthday Eana! 🎉 May your day be filled with joy and love. You deserve all the happiness in the world! ',
-        username: 'jooooommm',
-        profileImage: '/jomm.jpg',
-        likes: 1247,
-        comments: [],
-        hasMusic: true,
-        musicTrack: 'Happy Birthday - Music Box Version',
-        musicArtist: 'Instrumental City',
-        musicUrl: '/Happy Birthday to YouBirthday Song [Music Box].mp3'
-      },
-      {
-        id: 2,
-        type: 'photo',
-        imageUrl: '/Eana.jpg',
-        caption: 'I want to be completely honest with you... I\'m courting you.  Every moment we\'ve spent together made me realize how special you are. You\'re not just someone I care about,you\'re someone I want to build a future with. Will you let me show you how much you mean to me? ❤️',
-        username: 'jooooommm',
-        profileImage: '/jomm.jpg',
-        likes: 2156,
-        comments: [],
-        hasMusic: true,
-        musicTrack: 'We Could Happen',
-        musicArtist: 'AJ Rafael',
-        musicUrl: '/Aj Rafael - We Could Happen (Lyrics).mp3'
-      },
-      {
-        id: 3,
-        type: 'interactive',
-        caption: 'Now it\'s your turn... Share your thoughts, feelings, or message. I want to hear what\'s in your heart. ',
-        username: 'jooooommm',
-        profileImage: '/jomm.jpg',
-        likes: 0,
-        comments: []
-      }
-    ];
+    let unsubscribePosts = null;
+    let unsubscribeComments = {};
 
-    // Show posts immediately - no database loading needed
-    setPosts(specificPosts);
-    setLoading(false);
-
-    // Load user interactions (likes, comments) from database
-    const loadUserInteractions = async () => {
+    const initializeFeed = async () => {
       try {
-        // Load likes for each post
-        for (let i = 0; i < specificPosts.length; i++) {
-          const postId = i + 1;
+        setLoading(true);
+        
+        // Initialize default posts in database if they don't exist
+        await databaseService.initializeDefaultPosts();
+        
+        // Set up real-time listener for posts
+        unsubscribePosts = databaseService.listenToPosts((postsData) => {
+          // Convert to array format with proper IDs
+          const postsArray = [];
           
-          // Load likes count
-          const likesRef = ref(database, `posts/${postId}/likes`);
-          onValue(likesRef, (snapshot) => {
-            const likesCount = snapshot.val() || 0;
-            if (likesCount > 0) {
-              setPosts(prevPosts => 
-                prevPosts.map(post => 
-                  post.id === postId ? { ...post, likes: likesCount } : post
-                )
-              );
+          // Ensure we have the 3 default posts in the right order
+          for (let i = 1; i <= 3; i++) {
+            const postData = postsData.find(p => p.id === i.toString()) || postsData.find(p => p.id === i);
+            if (postData) {
+              postsArray.push({
+                ...postData,
+                id: i,
+                comments: [] // Initialize comments array
+              });
             }
-          });
+          }
+          
+          // If no posts from database, use fallback
+          if (postsArray.length === 0) {
+            const fallbackPosts = [
+              {
+                id: 1,
+                type: 'photo',
+                imageUrl: '/BirthdayGirl.jpg',
+                caption: 'Happy Birthday Eana! 🎉 May your day be filled with joy and love. You deserve all the happiness in the world!',
+                username: 'jooooommm',
+                profileImage: '/jomm.jpg',
+                likes: 1247,
+                comments: [],
+                hasMusic: true,
+                musicTrack: 'Happy Birthday - Music Box Version',
+                musicArtist: 'Instrumental City',
+                musicUrl: '/Happy Birthday to YouBirthday Song [Music Box].mp3'
+              },
+              {
+                id: 2,
+                type: 'photo',
+                imageUrl: '/Eana.jpg',
+                caption: 'I want to be completely honest with you... I\'m courting you. Every moment we\'ve spent together made me realize how special you are. You\'re not just someone I care about, you\'re someone I want to build a future with. Will you let me show you how much you mean to me? ❤️',
+                username: 'jooooommm',
+                profileImage: '/jomm.jpg',
+                likes: 2156,
+                comments: [],
+                hasMusic: true,
+                musicTrack: 'We Could Happen',
+                musicArtist: 'AJ Rafael',
+                musicUrl: '/Aj Rafael - We Could Happen (Lyrics).mp3'
+              },
+              {
+                id: 3,
+                type: 'interactive',
+                caption: 'Now it\'s your turn... Share your thoughts, feelings, or message. I want to hear what\'s in your heart.',
+                username: 'jooooommm',
+                profileImage: '/jomm.jpg',
+                likes: 0,
+                comments: []
+              }
+            ];
+            postsArray.push(...fallbackPosts);
+          }
+          
+          setPosts(postsArray);
+          setLoading(false);
+        });
 
-          // Load comments
-          const commentsRef = ref(database, `posts/${postId}/comments`);
-          onValue(commentsRef, (snapshot) => {
-            const comments = snapshot.val() || [];
-            if (comments.length > 0) {
-              setPosts(prevPosts => 
-                prevPosts.map(post => 
-                  post.id === postId ? { ...post, comments: comments } : post
-                )
-              );
-            }
+        // Set up listeners for comments on each post
+        for (let i = 1; i <= 3; i++) {
+          unsubscribeComments[i] = databaseService.listenToComments(i, (comments) => {
+            setPosts(prevPosts =>
+              prevPosts.map(post =>
+                post.id === i ? { ...post, comments: comments } : post
+              )
+            );
           });
         }
+
       } catch (error) {
-        console.log('Loading user interactions:', error);
+        console.error('Error initializing feed:', error);
+        setLoading(false);
       }
     };
 
-    // Load interactions in background
-    loadUserInteractions();
+    initializeFeed();
 
+    // Cleanup function
     return () => {
-      // Cleanup listeners
-      const postsRef = ref(database, 'posts');
-      onValue(postsRef, () => {});
+      if (unsubscribePosts) {
+        unsubscribePosts();
+      }
+      Object.values(unsubscribeComments).forEach(unsubscribe => {
+        if (unsubscribe) unsubscribe();
+      });
     };
   }, []);
 
-  const handleLike = (postId) => {
+  const handleLike = async (postId) => {
+    if (!currentUser) {
+      alert('Please log in to like posts');
+      return;
+    }
+
     const currentPost = posts.find(p => p.id === postId);
     const newLikesCount = currentPost.likes + 1;
     
@@ -115,40 +131,45 @@ const Feed = ({ currentUser }) => {
       )
     );
     
-    // Save to database in background
-    const postRef = ref(database, `posts/${postId}/likes`);
-    set(postRef, newLikesCount);
-    
-    // Track user interaction in database
-    if (currentUser) {
-      const userActivityRef = ref(database, `userActivity/${currentUser.uid}/likes`);
-      push(userActivityRef, {
-        postId: postId,
-        timestamp: Date.now(),
-        action: 'like'
-      });
+    // Save to database
+    try {
+      await databaseService.likePost(postId, currentUser.uid);
+    } catch (error) {
+      console.error('Error liking post:', error);
+      // Revert optimistic update on error
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.id === postId
+            ? { ...post, likes: currentPost.likes }
+            : post
+        )
+      );
     }
   };
 
-  const handleComment = (postId, comment) => {
+  const handleComment = async (postId, comment) => {
+    if (!currentUser) {
+      alert('Please log in to comment');
+      return;
+    }
+
     const newComment = {
       ...comment,
-      timestamp: Date.now()
+      username: currentUser.displayName || currentUser.username,
+      userId: currentUser.uid
     };
     
-    // Update local state immediately for better UX
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.id === postId
-          ? { ...post, comments: [...post.comments, newComment] }
-          : post
-      )
-    );
-    
-    // Save to database in background
-    const commentsRef = ref(database, `posts/${postId}/comments`);
-    const newCommentRef = push(commentsRef);
-    set(newCommentRef, newComment);
+    // Save to database
+    try {
+      const result = await databaseService.addComment(postId, currentUser.uid, newComment);
+      if (!result.success) {
+        console.error('Error adding comment:', result.error);
+        alert('Failed to add comment. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Failed to add comment. Please try again.');
+    }
   };
 
   if (loading) {
