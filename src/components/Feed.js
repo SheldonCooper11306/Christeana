@@ -76,6 +76,16 @@ const Feed = ({ currentUser }) => {
     const postRef = ref(database, `posts/${postId - 1}/likes`);
     set(postRef, posts.find(p => p.id === postId).likes + 1);
     
+    // Track user interaction in database
+    if (currentUser) {
+      const userActivityRef = ref(database, `userActivity/${currentUser.uid}/likes`);
+      push(userActivityRef, {
+        postId: postId,
+        timestamp: Date.now(),
+        action: 'like'
+      });
+    }
+    
     // Also update local state
     setPosts(prevPosts =>
       prevPosts.map(post =>

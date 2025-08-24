@@ -51,7 +51,7 @@ function App() {
         <div className="app-header">
           <div className="header-content">
             <div className="header-left">
-                             <h1 className="birthday-text">Admin Panel</h1>
+                             <h1 className="instagram-text">Admin Panel</h1>
             </div>
             <div className="header-right">
               <span className="welcome-text">Welcome, {user?.displayName || user?.email || 'User'}!</span>
@@ -78,7 +78,7 @@ function App() {
           <div className="app-header">
             <div className="header-content">
                           <div className="header-left">
-                             <h1 className="birthday-text">🎉 Happy Birthday 🎉</h1>
+                             <h1 className="instagram-text">Instagram</h1>
             </div>
               <div className="header-right">
                 <span className="welcome-text">Welcome, {user?.displayName || user?.email || 'User'}!</span>

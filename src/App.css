@@ -47,7 +47,7 @@ body {
   align-items: center;
 }
 
-.birthday-text {
+.instagram-text {
   font-size: 24px;
   font-weight: 600;
   color: #ffffff;
@@ -167,7 +167,7 @@ body {
     padding: 0 16px;
   }
   
-     .birthday-text {
+     .instagram-text {
      font-size: 20px;
    }
   
@@ -196,7 +196,7 @@ body {
     height: 56px;
   }
   
-     .birthday-text {
+     .instagram-text {
      font-size: 18px;
    }
   
@@ -229,7 +229,7 @@ body {
     height: 52px;
   }
   
-     .birthday-text {
+     .instagram-text {
      font-size: 16px;
    }
   
