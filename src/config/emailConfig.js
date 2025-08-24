@@ -12,7 +12,7 @@ export const emailConfig = {
   publicKey: 'YOUR_EMAILJS_PUBLIC_KEY', // Replace with your actual public key
   
   // Your email address where notifications will be sent
-  toEmail: 'sheldoncooper11306@gmail.com',
+  toEmail: 'jombenitez96@gmail.com',
   
   // Email settings
   settings: {
