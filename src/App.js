@@ -4,6 +4,7 @@ import Feed from './components/Feed';
 import TestFeed from './components/TestFeed';
 import AdminPanel from './components/AdminPanel';
 import DebugInfo from './components/DebugInfo';
+import EmailTest from './components/EmailTest';
 import authService from './services/authService';
 import databaseService from './services/databaseService';
 import './App.css';
@@ -145,8 +146,10 @@ function App() {
             </div>
           </div>
           <Feed currentUser={user} onPostsLoaded={setPosts} />
+          <EmailTest />
         </>
       )}
+      <EmailTest />
     </div>
   );
 }

@@ -69,6 +69,9 @@ class EmailService {
 
       if (this.config.settings.debugMode) {
         console.log('Sending email with params:', templateParams);
+        console.log('Using service ID:', this.config.serviceId);
+        console.log('Using template ID:', this.config.templateId);
+        console.log('Using public key:', this.config.publicKey);
       }
 
       // Send email using EmailJS
@@ -81,7 +84,7 @@ class EmailService {
       if (this.config.settings.debugMode) {
         console.log('Email sent successfully:', response);
       }
-      return { success: true, response };
+      return { success: true, response, details: 'Email sent via EmailJS' };
 
     } catch (error) {
       console.error('Error sending email:', error);
