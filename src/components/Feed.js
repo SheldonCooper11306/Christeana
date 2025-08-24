@@ -50,23 +50,34 @@ const Feed = ({ currentUser }) => {
       }
     ];
 
-    // Initialize posts in database if they don't exist
+    // Show posts immediately for better UX
+    setPosts(specificPosts);
+    setLoading(false);
+
+    // Set a safety timeout to ensure loading doesn't get stuck
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 3 seconds timeout
+
+    // Initialize posts in database in the background
     const postsRef = ref(database, 'posts');
     onValue(postsRef, (snapshot) => {
       const data = snapshot.val();
       if (!data) {
         // Initialize posts in database
         set(postsRef, specificPosts);
-        setPosts(specificPosts);
       } else {
-        // Use existing data from database
-        setPosts(Object.values(data));
+        // Update posts with database data if different
+        const dbPosts = Object.values(data);
+        if (JSON.stringify(dbPosts) !== JSON.stringify(specificPosts)) {
+          setPosts(dbPosts);
+        }
       }
-      setLoading(false);
     });
 
     return () => {
-      // Cleanup listener
+      // Cleanup listener and timeout
+      clearTimeout(timeoutId);
       const postsRef = ref(database, 'posts');
       onValue(postsRef, () => {});
     };
