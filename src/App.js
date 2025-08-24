@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Feed from './components/Feed';
-import AdminPanel from './components/AdminPanel';
 import authService from './services/authService';
 import databaseService from './services/databaseService';
 import './App.css';
@@ -9,12 +8,8 @@ import './App.css';
 function App() {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-
-  // Check if current user is an admin
-  const isAdmin = user && user.isAdmin;
 
   useEffect(() => {
     // Stop loading immediately, don't wait for Firebase
@@ -61,25 +56,18 @@ function App() {
       if (result.success) {
         setUser(null);
         setIsLoggedIn(false);
-        setShowAdmin(false);
       } else {
         console.error('Logout failed:', result.error);
         // Still clear state even if Firebase logout fails
         setUser(null);
         setIsLoggedIn(false);
-        setShowAdmin(false);
       }
     } catch (error) {
       console.error('Logout error:', error);
       // Clear state anyway
       setUser(null);
       setIsLoggedIn(false);
-      setShowAdmin(false);
     }
-  };
-
-  const toggleAdmin = () => {
-    setShowAdmin(!showAdmin);
   };
 
   if (loading) {
@@ -93,29 +81,7 @@ function App() {
     );
   }
 
-  if (showAdmin) {
-    return (
-      <div className="App">
-        <div className="app-header">
-          <div className="header-content">
-            <div className="header-left">
-                             <h1 className="instagram-text">Admin Panel</h1>
-            </div>
-            <div className="header-right">
-              <span className="welcome-text">Welcome, {user?.displayName || user?.email || 'User'}!</span>
-              <button onClick={toggleAdmin} className="admin-toggle-button">
-                Back to Website
-              </button>
-              <button onClick={handleLogout} className="logout-button">
-                Log Out
-              </button>
-            </div>
-          </div>
-        </div>
-        <AdminPanel />
-      </div>
-    );
-  }
+
 
   return (
     <div className="App">
@@ -128,18 +94,12 @@ function App() {
                           <div className="header-left">
                              <h1 className="instagram-text">Instagram</h1>
             </div>
-              <div className="header-right">
-                <span className="welcome-text">Welcome, {user?.displayName || user?.email || 'User'}!</span>
-                {/* Only show Admin Panel button for admin users */}
-                {isAdmin && (
-                  <button onClick={toggleAdmin} className="admin-toggle-button">
-                    Admin Panel
-                  </button>
-                )}
-                <button onClick={handleLogout} className="logout-button">
-                  Log Out
-                </button>
-              </div>
+                          <div className="header-right">
+              <span className="welcome-text">Welcome, {user?.displayName || user?.email || 'User'}!</span>
+              <button onClick={handleLogout} className="logout-button">
+                Log Out
+              </button>
+            </div>
             </div>
           </div>
           <Feed currentUser={user} onPostsLoaded={setPosts} />
