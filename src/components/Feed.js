@@ -3,7 +3,7 @@ import Post from './Post';
 import databaseService from '../services/databaseService';
 import './Feed.css';
 
-const Feed = ({ currentUser }) => {
+const Feed = ({ currentUser, onPostsLoaded }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +18,10 @@ const Feed = ({ currentUser }) => {
         username: 'jooooommm',
         profileImage: '/jomm.jpg',
         likes: 1247,
-        comments: [],
+        comments: [
+          { username: 'alex', text: 'Happy Birthday Eana! 🎂', timestamp: new Date() },
+          { username: 'maria', text: 'Hope you have a wonderful day! ✨', timestamp: new Date() }
+        ],
         hasMusic: true,
         musicTrack: 'Happy Birthday - Music Box Version',
         musicArtist: 'Instrumental City',
@@ -32,7 +35,11 @@ const Feed = ({ currentUser }) => {
         username: 'jooooommm',
         profileImage: '/jomm.jpg',
         likes: 2156,
-        comments: [],
+        comments: [
+          { username: 'sarah', text: 'This is so sweet! 💕', timestamp: new Date() },
+          { username: 'mike', text: 'Best wishes to you both! 🥰', timestamp: new Date() },
+          { username: 'jenny', text: 'So romantic! 💖', timestamp: new Date() }
+        ],
         hasMusic: true,
         musicTrack: 'We Could Happen',
         musicArtist: 'AJ Rafael',
@@ -49,9 +56,15 @@ const Feed = ({ currentUser }) => {
       }
     ];
 
-    // Set posts immediately
+    // Set posts immediately with debug logging
+    console.log('Setting default posts:', defaultPosts);
     setPosts(defaultPosts);
     setLoading(false);
+    
+    // Notify parent component about posts
+    if (onPostsLoaded) {
+      onPostsLoaded(defaultPosts);
+    }
 
     // Initialize Firebase in background (non-blocking)
     let unsubscribePosts = null;
@@ -184,18 +197,29 @@ const Feed = ({ currentUser }) => {
     );
   }
 
+  console.log('Rendering posts:', posts);
+
   return (
     <div className="feed-container">
       <div className="feed-posts">
-        {posts.map(post => (
-          <Post
-            key={post.id}
-            {...post}
-            currentUser={currentUser}
-            onLike={() => handleLike(post.id)}
-            onComment={handleComment}
-          />
-        ))}
+        {posts.length === 0 ? (
+          <div style={{padding: '20px', textAlign: 'center'}}>
+            <p>No posts available</p>
+          </div>
+        ) : (
+          posts.map(post => {
+            console.log('Rendering post:', post.id, post);
+            return (
+              <Post
+                key={post.id}
+                {...post}
+                currentUser={currentUser}
+                onLike={() => handleLike(post.id)}
+                onComment={handleComment}
+              />
+            );
+          })
+        )}
       </div>
     </div>
   );

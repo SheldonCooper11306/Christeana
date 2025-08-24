@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Feed from './components/Feed';
+import TestFeed from './components/TestFeed';
 import AdminPanel from './components/AdminPanel';
+import DebugInfo from './components/DebugInfo';
 import authService from './services/authService';
 import databaseService from './services/databaseService';
 import './App.css';
@@ -11,6 +13,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
 
   // Check if current user is an admin
   const isAdmin = user && user.isAdmin;
@@ -141,7 +144,8 @@ function App() {
               </div>
             </div>
           </div>
-          <Feed currentUser={user} />
+          <TestFeed currentUser={user} />
+          <DebugInfo posts={posts} currentUser={user} isLoggedIn={isLoggedIn} />
         </>
       )}
     </div>
