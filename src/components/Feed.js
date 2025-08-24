@@ -44,16 +44,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
         musicTrack: 'We Could Happen',
         musicArtist: 'AJ Rafael',
         musicUrl: '/Aj Rafael - We Could Happen (Lyrics).mp3'
-      },
-      {
-        id: 3,
-        type: 'interactive',
-        caption: 'Now it\'s your turn... Share your thoughts, feelings, or message. I want to hear what\'s in your heart.',
-        username: 'jooooommm',
-        profileImage: '/jomm.jpg',
-        likes: 0,
-        comments: []
-      }
+
     ];
 
     // Set posts immediately
@@ -81,7 +72,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
           if (postsData && postsData.length > 0) {
             // Update posts with Firebase data only if we have it
             const postsArray = [];
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 2; i++) {
               const postData = postsData.find(p => p.id === i.toString()) || postsData.find(p => p.id === i);
               if (postData) {
                 postsArray.push({
@@ -99,7 +90,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
         });
 
         // Set up comment listeners for each post
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 2; i++) {
           unsubscribeComments[i] = databaseService.listenToComments(i, (comments) => {
             setPosts(prevPosts =>
               prevPosts.map(post =>
