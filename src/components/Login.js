@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { auth } from '../firebase/config';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
@@ -90,32 +90,7 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  const handleAnonymousLogin = async () => {
-    setIsLoading(true);
-    setError('');
-    console.log('Starting anonymous login...');
 
-    try {
-      const result = await signInAnonymously(auth);
-      const user = result.user;
-      
-      console.log('Anonymous login successful:', user);
-      
-      const userData = {
-        email: null,
-        displayName: 'Guest User',
-        uid: user.uid,
-        isAdmin: false
-      };
-      
-      onLogin(userData);
-    } catch (error) {
-      console.error('Anonymous login error:', error);
-      setError(`Anonymous login failed: ${error.message}. Please try again.`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="login-container">
@@ -149,16 +124,7 @@ const Login = ({ onLogin }) => {
           <span>OR</span>
         </div>
 
-        <div className="anonymous-login">
-          <button
-            onClick={handleAnonymousLogin}
-            className="anonymous-button"
-            disabled={isLoading}
-            type="button"
-          >
-            Continue as Guest
-          </button>
-        </div>
+
 
         <form onSubmit={handleEmailLogin} className="login-form">
           <div className="form-group">

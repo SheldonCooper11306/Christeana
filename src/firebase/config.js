@@ -11,8 +11,8 @@ const firebaseConfig = {
   projectId: "eana-birthday",
   storageBucket: "eana-birthday.firebasestorage.app",
   messagingSenderId: "740038878500",
-  appId: "1:740038878500:web:e9c374e580845267acbfb1",
-  measurementId: "G-0902GDP6JW"
+  appId: "1:740038878500:web:6e31e0ba182c955facbfb1",
+  measurementId: "G-VS7RYRE6NC"
 };
 
 // Initialize Firebase
