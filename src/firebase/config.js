@@ -1,8 +1,8 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDzHZt4LV1Te2bkX2yud-DOURQ_-n3RGpw",
   authDomain: "eana-birthday.firebaseapp.com",
@@ -14,10 +14,11 @@ const firebaseConfig = {
   measurementId: "G-VS7RYRE6NC"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Firebase services
 export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+export const analytics = getAnalytics(app);
 
 export default app;
