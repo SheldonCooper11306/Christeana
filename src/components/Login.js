@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { auth } from '../firebase/config';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
@@ -27,7 +27,7 @@ const Login = ({ onLogin }) => {
         email: user.email,
         displayName: user.displayName || user.email,
         uid: user.uid,
-        isAdmin: email === 'jom@gmail.com'
+        isAdmin: email === 'jom'
       };
       
       onLogin(userData);
@@ -47,51 +47,17 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  const handleCreateAccount = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
-    }
 
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      console.log('Account created successfully:', user);
-      
-      const userData = {
-        email: user.email,
-        displayName: user.email,
-        uid: user.uid,
-        isAdmin: user.email === 'jom@gmail.com'
-      };
-      
-      onLogin(userData);
-    } catch (error) {
-      console.error('Account creation error:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        setError('An account with this email already exists. Please log in instead.');
-      } else if (error.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters long.');
-      } else if (error.code === 'auth/invalid-email') {
-        setError('Invalid email address.');
-      } else {
-        setError(`Account creation failed: ${error.message}. Please try again.`);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="login-container">
       <div className="login-card">
-        <div className="birthday-logo">
-          <h1 className="birthday-title">🎉 Happy Birthday 🎉</h1>
+        <div className="instagram-logo">
+          <img 
+            src="https://www.instagram.com/static/images/web/logged_out_wordmark.png/7a252de00b20.png" 
+            alt="Instagram" 
+            className="logo-image"
+          />
         </div>
 
         <form onSubmit={handleEmailLogin} className="login-form">
@@ -116,23 +82,13 @@ const Login = ({ onLogin }) => {
             />
           </div>
           {error && <div className="error-message">{error}</div>}
-          <div className="button-group">
-            <button
-              type="submit"
-              className="login-button"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging in...' : 'Log In'}
-            </button>
-            <button
-              type="button"
-              onClick={handleCreateAccount}
-              className="create-account-button"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating...' : 'Create Account'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Log In'}
+          </button>
         </form>
       </div>
     </div>

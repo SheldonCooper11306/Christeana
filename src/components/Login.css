@@ -20,17 +20,15 @@
   margin-bottom: 10px;
 }
 
-.birthday-logo {
+.instagram-logo {
   margin: 22px auto 12px;
   text-align: center;
 }
 
-.birthday-title {
-  color: #ffffff;
-  font-size: 28px;
-  font-weight: bold;
-  margin: 0;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+.logo-image {
+  height: 51px;
+  width: auto;
+  filter: invert(1);
 }
 
 .login-form {
@@ -98,43 +96,13 @@
   cursor: not-allowed;
 }
 
-.button-group {
-  display: flex;
-  gap: 10px;
+.login-button {
+  width: 100%;
+  min-height: 44px;
   margin-top: 8px;
 }
 
-.login-button,
-.create-account-button {
-  flex: 1;
-  min-height: 44px;
-}
 
-.create-account-button {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 5px 9px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.create-account-button:hover:not(:disabled) {
-  background: #218838;
-}
-
-.create-account-button:active:not(:disabled) {
-  background: #1e7e34;
-  transform: scale(0.98);
-}
-
-.create-account-button:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-}
 
 .error-message {
   color: #ed4956;
@@ -199,10 +167,6 @@
     min-height: 42px;
     font-size: 13px;
   }
-  
-
-  
-
 }
 
 @media (max-width: 480px) {
