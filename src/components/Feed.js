@@ -18,10 +18,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
         username: 'jooooommm',
         profileImage: '/jomm.jpg',
         likes: 1247,
-        comments: [
-          { username: 'alex', text: 'Happy Birthday Eana! 🎂', timestamp: new Date() },
-          { username: 'maria', text: 'Hope you have a wonderful day! ✨', timestamp: new Date() }
-        ],
+        comments: [],
         hasMusic: true,
         musicTrack: 'Happy Birthday - Music Box Version',
         musicArtist: 'Instrumental City',
@@ -35,11 +32,7 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
         username: 'jooooommm',
         profileImage: '/jomm.jpg',
         likes: 2156,
-        comments: [
-          { username: 'sarah', text: 'This is so sweet! 💕', timestamp: new Date() },
-          { username: 'mike', text: 'Best wishes to you both! 🥰', timestamp: new Date() },
-          { username: 'jenny', text: 'So romantic! 💖', timestamp: new Date() }
-        ],
+        comments: [],
         hasMusic: true,
         musicTrack: 'We Could Happen',
         musicArtist: 'AJ Rafael',
