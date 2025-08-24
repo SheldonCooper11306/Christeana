@@ -16,41 +16,30 @@ function App() {
   const isAdmin = user && user.isAdmin;
 
   useEffect(() => {
-    // Initialize services and auth state
-    const initializeApp = async () => {
-      try {
-        // Initialize predefined accounts in Firebase
-        await authService.initializePredefinedAccounts();
+    // Stop loading immediately, don't wait for Firebase
+    setLoading(false);
+    
+    // Initialize Firebase accounts in background (non-blocking)
+    authService.initializePredefinedAccounts().catch(error => {
+      console.log('Firebase initialization running in background:', error);
+    });
+    
+    // Set up auth state listener
+    const unsubscribe = authService.onAuthStateChange((userData) => {
+      if (userData) {
+        setUser(userData);
+        setIsLoggedIn(true);
         
-        // Set up auth state listener
-        const unsubscribe = authService.onAuthStateChange((userData) => {
-          if (userData) {
-            setUser(userData);
-            setIsLoggedIn(true);
-            
-            // Track page view
-            databaseService.trackPageView(userData.uid, window.location.href);
-          } else {
-            setUser(null);
-            setIsLoggedIn(false);
-            setShowAdmin(false);
-          }
-          setLoading(false);
+        // Track page view in background
+        databaseService.trackPageView(userData.uid, window.location.href).catch(err => {
+          console.log('Page tracking running in background:', err);
         });
-
-        // If no user after 2 seconds, stop loading
-        setTimeout(() => {
-          setLoading(false);
-        }, 2000);
-
-        return unsubscribe;
-      } catch (error) {
-        console.error('Error initializing app:', error);
-        setLoading(false);
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+        setShowAdmin(false);
       }
-    };
-
-    const unsubscribe = initializeApp();
+    });
     
     return () => {
       if (unsubscribe && typeof unsubscribe === 'function') {

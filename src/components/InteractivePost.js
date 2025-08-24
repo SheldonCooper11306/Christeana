@@ -10,10 +10,25 @@ const InteractivePost = ({ postId, onMessageSubmitted }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up real-time listener for birthday messages
+    // Stop loading immediately and show empty state
+    setLoading(false);
+    
+    // Load messages from localStorage first (immediate)
+    try {
+      const savedMessages = localStorage.getItem('birthday-messages');
+      if (savedMessages) {
+        const localMessages = JSON.parse(savedMessages);
+        setMessages(localMessages);
+      }
+    } catch (error) {
+      console.log('Error loading local messages:', error);
+    }
+
+    // Set up Firebase listener in background
     const unsubscribe = databaseService.listenToBirthdayMessages((messagesData) => {
-      setMessages(messagesData);
-      setLoading(false);
+      if (messagesData && messagesData.length > 0) {
+        setMessages(messagesData);
+      }
     });
 
     // Cleanup function
