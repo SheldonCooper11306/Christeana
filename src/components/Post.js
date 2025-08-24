@@ -12,7 +12,7 @@ const Post = ({
   profileImage,
   currentUser,
   likes, 
-  comments, 
+  comments = [], 
   hasMusic,
   musicTrack,
   musicArtist,
@@ -217,7 +217,7 @@ const Post = ({
             <span className="username">{username}</span> {caption}
           </div>
 
-          {comments.length > 0 && (
+          {comments && comments.length > 0 && (
             <div className="comments-section">
               {comments.slice(0, 2).map((comment, index) => (
                 <div key={index} className="comment">
@@ -236,7 +236,7 @@ const Post = ({
           )}
         </div>
 
-        {showComments && (
+        {showComments && comments && (
           <div className="comments-expanded">
             {comments.map((comment, index) => (
               <div key={index} className="comment">
