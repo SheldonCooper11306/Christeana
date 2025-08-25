@@ -1,26 +1,51 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
-import { getAnalytics } from "firebase/analytics";
+// Firebase configuration - simplified for local development
+// Since we're now using username-only login, we can create a minimal Firebase setup
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDzHZt4LV1Te2bkX2yud-DOURQ_-n3RGpw",
-  authDomain: "eana-birthday.firebaseapp.com",
-  databaseURL: "https://eana-birthday-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "eana-birthday",
-  storageBucket: "eana-birthday.firebasestorage.app",
-  messagingSenderId: "740038878500",
-  appId: "1:740038878500:web:6e31e0ba182c955facbfb1",
-  measurementId: "G-VS7RYRE6NC"
+// Mock Firebase objects for development
+const mockAuth = {
+  currentUser: null,
+  signInWithEmailAndPassword: () => Promise.resolve({ user: { uid: 'mock-uid', email: 'mock@email.com' } }),
+  createUserWithEmailAndPassword: () => Promise.resolve({ user: { uid: 'mock-uid', email: 'mock@email.com' } }),
+  signOut: () => Promise.resolve(),
+  onAuthStateChanged: (callback) => {
+    // Return unsubscribe function
+    return () => {};
+  },
+  updateProfile: () => Promise.resolve()
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const mockDatabase = {
+  ref: () => ({
+    set: () => Promise.resolve(),
+    get: () => Promise.resolve({ exists: () => false, val: () => null }),
+    update: () => Promise.resolve(),
+    on: () => {},
+    off: () => {},
+    remove: () => Promise.resolve()
+  })
+};
 
-// Initialize Firebase services
-export const auth = getAuth(app);
-export const database = getDatabase(app);
-export const analytics = getAnalytics(app);
+// Export mock objects for development
+export const auth = mockAuth;
+export const database = mockDatabase;
 
-export default app;
+// Mock Firebase functions
+export const ref = (db, path) => ({
+  set: () => Promise.resolve(),
+  get: () => Promise.resolve({ exists: () => false, val: () => null }),
+  update: () => Promise.resolve(),
+  on: () => {},
+  off: () => {},
+  remove: () => Promise.resolve()
+});
+
+export const set = () => Promise.resolve();
+export const get = () => Promise.resolve({ exists: () => false, val: () => null });
+export const update = () => Promise.resolve();
+export const remove = () => Promise.resolve();
+export const serverTimestamp = () => new Date().toISOString();
+export const onAuthStateChanged = (auth, callback) => () => {};
+export const signInWithEmailAndPassword = () => Promise.resolve({ user: { uid: 'mock-uid', email: 'mock@email.com' } });
+export const createUserWithEmailAndPassword = () => Promise.resolve({ user: { uid: 'mock-uid', email: 'mock@email.com' } });
+export const signOut = () => Promise.resolve();
+export const updateProfile = () => Promise.resolve();

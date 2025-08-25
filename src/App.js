@@ -10,6 +10,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
+  const [currentlyPlayingAudio, setCurrentlyPlayingAudio] = useState(null);
 
   useEffect(() => {
     // Stop loading immediately, don't wait for Firebase
@@ -33,7 +34,6 @@ function App() {
       } else {
         setUser(null);
         setIsLoggedIn(false);
-        setShowAdmin(false);
       }
     });
     
@@ -52,6 +52,12 @@ function App() {
 
   const handleLogout = async () => {
     try {
+      // Stop any playing audio before logout
+      if (currentlyPlayingAudio) {
+        currentlyPlayingAudio.pause();
+        setCurrentlyPlayingAudio(null);
+      }
+      
       const result = await authService.logout();
       if (result.success) {
         setUser(null);
@@ -67,6 +73,24 @@ function App() {
       // Clear state anyway
       setUser(null);
       setIsLoggedIn(false);
+    }
+  };
+
+  // Global audio management functions
+  const handleAudioPlay = (audioElement, postId) => {
+    // Stop currently playing audio if it's different
+    if (currentlyPlayingAudio && currentlyPlayingAudio !== audioElement) {
+      currentlyPlayingAudio.pause();
+      currentlyPlayingAudio.currentTime = 0;
+    }
+    
+    // Set new audio as currently playing
+    setCurrentlyPlayingAudio(audioElement);
+  };
+
+  const handleAudioStop = (audioElement) => {
+    if (currentlyPlayingAudio === audioElement) {
+      setCurrentlyPlayingAudio(null);
     }
   };
 
@@ -102,7 +126,13 @@ function App() {
             </div>
             </div>
           </div>
-          <Feed currentUser={user} onPostsLoaded={setPosts} />
+          <Feed 
+            currentUser={user} 
+            onPostsLoaded={setPosts} 
+            onAudioPlay={handleAudioPlay}
+            onAudioStop={handleAudioStop}
+            currentlyPlayingAudio={currentlyPlayingAudio}
+          />
         </>
       )}
     </div>

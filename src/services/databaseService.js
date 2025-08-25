@@ -345,7 +345,7 @@ class DatabaseService {
   }
 
   /**
-   * Delete a birthday message (admin only)
+   * Delete a birthday message
    */
   async deleteBirthdayMessage(messageId) {
     try {
@@ -379,7 +379,7 @@ class DatabaseService {
   }
 
   /**
-   * Get analytics data (admin only)
+   * Get analytics data
    */
   async getAnalytics() {
     try {
@@ -402,7 +402,7 @@ class DatabaseService {
   }
 
   /**
-   * Export data for backup (admin only)
+   * Export data for backup
    */
   async exportAllData() {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import InteractivePost from './InteractivePost';
 import './Post.css';
 
@@ -18,11 +18,25 @@ const Post = ({
   musicArtist,
   musicUrl,
   onLike, 
-  onComment 
+  onComment,
+  onAudioPlay,
+  onAudioStop,
+  currentlyPlayingAudio
 }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
+
+  // Sync local playing state with global audio management
+  useEffect(() => {
+    if (currentlyPlayingAudio && audioRef.current && currentlyPlayingAudio !== audioRef.current) {
+      // Another audio is playing, stop this one
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  }, [currentlyPlayingAudio, isPlaying]);
 
   const handleLike = () => {
     if (!isLiked) {
@@ -38,7 +52,14 @@ const Post = ({
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
+        if (onAudioStop) {
+          onAudioStop(audioRef.current);
+        }
       } else {
+        // Call global audio management before playing
+        if (onAudioPlay) {
+          onAudioPlay(audioRef.current, id);
+        }
         audioRef.current.play();
         setIsPlaying(true);
       }
@@ -47,6 +68,9 @@ const Post = ({
 
   const handleAudioEnded = () => {
     setIsPlaying(false);
+    if (onAudioStop) {
+      onAudioStop(audioRef.current);
+    }
   };
 
   const formatLikes = (count) => {

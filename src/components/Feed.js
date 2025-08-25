@@ -3,7 +3,7 @@ import Post from './Post';
 import databaseService from '../services/databaseService';
 import './Feed.css';
 
-const Feed = ({ currentUser, onPostsLoaded }) => {
+const Feed = ({ currentUser, onPostsLoaded, onAudioPlay, onAudioStop, currentlyPlayingAudio }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -195,6 +195,9 @@ const Feed = ({ currentUser, onPostsLoaded }) => {
               currentUser={currentUser}
               onLike={() => handleLike(post.id)}
               onComment={handleComment}
+              onAudioPlay={onAudioPlay}
+              onAudioStop={onAudioStop}
+              currentlyPlayingAudio={currentlyPlayingAudio}
             />
           ))
         )}

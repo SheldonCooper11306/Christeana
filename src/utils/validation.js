@@ -123,12 +123,7 @@ export const isValidEmail = (email) => {
   return emailRegex.test(email);
 };
 
-/**
- * Check if user is admin
- */
-export const isAdmin = (user) => {
-  return user && user.isAdmin === true;
-};
+
 
 /**
  * Format timestamp for display

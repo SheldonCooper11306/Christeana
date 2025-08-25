@@ -4,14 +4,13 @@ import './Login.css';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    if (!username || !password) {
-      setError('Please enter both username and password');
+    if (!username) {
+      setError('Please enter a username');
       return;
     }
 
@@ -19,18 +18,13 @@ const Login = ({ onLogin }) => {
     setError('');
 
     try {
-      // Try Firebase Auth first
-      let result = await authService.loginWithCredentials(username, password);
-      
-      // If Firebase Auth fails, try fallback login
-      if (!result.success) {
-        result = authService.loginFallback(username, password);
-      }
+      // Use the new simplified login method
+      const result = await authService.loginWithUsernameOnly(username);
 
       if (result.success) {
         onLogin(result.user);
       } else {
-        setError(result.error || 'Invalid username or password. Please try again.');
+        setError(result.error || 'Login failed. Please try again.');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -54,23 +48,13 @@ const Login = ({ onLogin }) => {
         </div>
 
         <form onSubmit={handleEmailLogin} className="login-form">
-                  <div className="form-group">
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
           <div className="form-group">
             <input
-              type="password"
+              type="text"
               className="form-input"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
             />
           </div>
@@ -80,7 +64,7 @@ const Login = ({ onLogin }) => {
             className="login-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Log In'}
+            {isLoading ? 'Entering...' : 'Enter'}
           </button>
         </form>
       </div>

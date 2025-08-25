@@ -66,29 +66,7 @@ body {
   font-weight: 500;
 }
 
-.admin-toggle-button {
-  background: #1db954;
-  color: white;
-  border: none;
-  padding: 7px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  /* Touch-friendly sizing for mobile */
-  min-height: 36px;
-  min-width: 100px;
-}
 
-.admin-toggle-button:hover {
-  background: #1ed760;
-}
-
-.admin-toggle-button:active {
-  background: #1aa34a;
-  transform: scale(0.98);
-}
 
 .logout-button {
   background: #0095f6;
@@ -178,12 +156,7 @@ body {
     min-width: 70px;
   }
   
-  .admin-toggle-button {
-    padding: 6px 12px;
-    font-size: 13px;
-    min-height: 32px;
-    min-width: 90px;
-  }
+
   
   .welcome-text {
     font-size: 13px;
@@ -207,12 +180,7 @@ body {
     min-width: 65px;
   }
   
-  .admin-toggle-button {
-    padding: 5px 10px;
-    font-size: 12px;
-    min-height: 30px;
-    min-width: 80px;
-  }
+
   
   .welcome-text {
     font-size: 12px;
@@ -240,12 +208,7 @@ body {
     min-width: 60px;
   }
   
-  .admin-toggle-button {
-    padding: 4px 8px;
-    font-size: 11px;
-    min-height: 28px;
-    min-width: 70px;
-  }
+
   
   .welcome-text {
     font-size: 11px;
@@ -258,13 +221,11 @@ body {
 
 /* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
-  .logout-button:hover,
-  .admin-toggle-button:hover {
+  .logout-button:hover {
     background: #0095f6;
   }
   
-  .logout-button:active,
-  .admin-toggle-button:active {
+  .logout-button:active {
     background: #0066b3;
     transform: scale(0.95);
   }

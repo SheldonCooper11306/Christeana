@@ -19,25 +19,21 @@ class AuthService {
     'jom': {
       password: 'jom123',
       displayName: 'Jom',
-      isAdmin: true,
       email: 'jom@birthday.app'
     },
     'eana': {
       password: 'eana123',
       displayName: 'Eana',
-      isAdmin: false,
       email: 'eana@birthday.app'
     },
     'xandy': {
       password: 'xandy123',
       displayName: 'Xandy',
-      isAdmin: false,
       email: 'xandy@birthday.app'
     },
     'guest': {
       password: 'guest123',
       displayName: 'Guest',
-      isAdmin: false,
       email: 'guest@birthday.app'
     }
   };
@@ -66,7 +62,6 @@ class AuthService {
             username: username,
             displayName: userData.displayName,
             email: userData.email,
-            isAdmin: userData.isAdmin,
             profileImage: username === 'jom' ? '/jomm.jpg' : null
           });
 
@@ -121,7 +116,6 @@ class AuthService {
           email: userCredential.user.email,
           displayName: userProfile?.displayName || accountData.displayName,
           username: userProfile?.username || username,
-          isAdmin: userProfile?.isAdmin || accountData.isAdmin,
           profileImage: userProfile?.profileImage
         }
       };
@@ -130,6 +124,42 @@ class AuthService {
       return {
         success: false,
         error: error.message || 'Login failed'
+      };
+    }
+  }
+
+  /**
+   * Login with username only (accepts any name)
+   */
+  loginWithUsernameOnly(username) {
+    try {
+      // Clean the username
+      const cleanUsername = username.trim();
+      
+      if (!cleanUsername) {
+        return {
+          success: false,
+          error: 'Please enter a name'
+        };
+      }
+
+      // Check if it's a predefined account for special privileges
+      const accountData = AuthService.PREDEFINED_ACCOUNTS[cleanUsername.toLowerCase()];
+      
+      return {
+        success: true,
+        user: {
+          uid: `user_${cleanUsername.toLowerCase()}`,
+          email: accountData ? accountData.email : `${cleanUsername.toLowerCase()}@guest.app`,
+          displayName: accountData ? accountData.displayName : cleanUsername,
+          username: cleanUsername,
+          profileImage: accountData && cleanUsername.toLowerCase() === 'jom' ? '/jomm.jpg' : null
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Login failed'
       };
     }
   }
@@ -155,7 +185,6 @@ class AuthService {
           email: accountData.email,
           displayName: accountData.displayName,
           username: username,
-          isAdmin: accountData.isAdmin,
           profileImage: username === 'jom' ? '/jomm.jpg' : null
         }
       };
@@ -193,7 +222,6 @@ class AuthService {
           email: user.email,
           displayName: userProfile?.displayName || user.displayName,
           username: userProfile?.username,
-          isAdmin: userProfile?.isAdmin || false,
           profileImage: userProfile?.profileImage
         });
       } else {
@@ -236,18 +264,7 @@ class AuthService {
     }
   }
 
-  /**
-   * Check if user is admin
-   */
-  async isUserAdmin(uid) {
-    try {
-      const userProfile = await databaseService.getUserProfile(uid);
-      return userProfile?.isAdmin || false;
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      return false;
-    }
-  }
+
 }
 
 // Create and export a singleton instance
